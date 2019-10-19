@@ -1,0 +1,12 @@
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\Project.exe.config
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\Project.exe
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\Project.pdb
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\DocumentFormat.OpenXml.dll
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\System.IO.FileSystem.Primitives.dll
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\System.IO.Packaging.dll
+C:\Users\Дмитрий\source\repos\Project\Project\bin\Debug\DocumentFormat.OpenXml.xml
+C:\Users\Дмитрий\source\repos\Project\Project\obj\Debug\Project.csprojAssemblyReference.cache
+C:\Users\Дмитрий\source\repos\Project\Project\obj\Debug\Project.csproj.CoreCompileInputs.cache
+C:\Users\Дмитрий\source\repos\Project\Project\obj\Debug\Project.csproj.CopyComplete
+C:\Users\Дмитрий\source\repos\Project\Project\obj\Debug\Project.exe
+C:\Users\Дмитрий\source\repos\Project\Project\obj\Debug\Project.pdb
