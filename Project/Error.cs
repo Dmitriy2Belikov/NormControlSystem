@@ -11,5 +11,11 @@ namespace Project
 {
     class Error
     {
+        public string Parameter;
+
+        public Error(string param)
+        {
+            Parameter = param;
+        }
     }
 }
