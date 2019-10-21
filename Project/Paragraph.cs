@@ -33,7 +33,6 @@ namespace Project
 
                 attributes.Add(XmlData.ChildElements[i].LocalName, childAttr);
             }
-
             return attributes;
         }
     }

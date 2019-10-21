@@ -13,16 +13,16 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word.docx", TemplateType.coursework);
-            var errors = document.GetErrors(new GlobalParameters(2*Consts.Sm, 1.5*Consts.Sm, 2*Consts.Sm, 3*Consts.Sm));
+            var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word.docx", new CourseWork());
+            var errorsDict = document.GetErrors();
 
-            if (errors.Keys.Count > 0)
+            if (errorsDict.Keys.Count > 0)
             {
-                foreach (var paragraph in errors)
-                    if (paragraph.Value.Count > 0)
-                        foreach (var error in paragraph.Value)
+                foreach (var paragraphIndex in errorsDict)
+                    if (paragraphIndex.Value.Count > 0)
+                        foreach (var error in paragraphIndex.Value)
                         {
-                            Console.WriteLine("Error in {0} paragraph in {1} parameter", paragraph.Key, error.Parameter);
+                            Console.WriteLine("Error in {0} paragraph in {1} parameter", paragraphIndex.Key, error.Parameter);
                         }
             }
             else Console.WriteLine("Succesful!!!");

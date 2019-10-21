@@ -13,6 +13,7 @@ namespace Project
         public double MarginLeft { get; }
         public double MarginRight { get; }
         public Dictionary<string, double> Parameters;
+
         public GlobalParameters(double margTop, double margRight, double margBottom, double margLeft)
         {
             MarginBottom = margBottom;

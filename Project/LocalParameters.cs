@@ -10,6 +10,7 @@ namespace Project
     {
         public double Font { get; }
         public string FontFamily { get; }
+
         public LocalParameters(double font, string fontFamily)
         {
             Font = font;

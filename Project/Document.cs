@@ -19,16 +19,16 @@ namespace Project
         private List<Paragraph> paragraphs;
         private string filePath;
         private GlobalParameters GlParameters;
-        private Template Template;
+        private ITemplate DocTemplate;
 
-        public Document(string path, TemplateType type)
+        public Document(string path, ITemplate template)
         {
             paragraphs = new List<Paragraph>();
             filePath = path;
-            Template = new Template(type);
+            DocTemplate = template;
         }
 
-        public Dictionary<int, List<Error>> GetErrors(GlobalParameters idealGlParameters)
+        public Dictionary<int, List<Error>> GetErrors()
         {
             var ErrorsDict = new Dictionary<int, List<Error>>();
             var GlobalErrors = new List<Error>();
@@ -41,8 +41,8 @@ namespace Project
                 var globAttributes = paragraphs.Last().GetParagraphAttributes();
                 GlParameters = new GlobalParameters(globAttributes["pgMar"][0], globAttributes["pgMar"][1], globAttributes["pgMar"][2], globAttributes["pgMar"][3]);
 
-                for (int i = 0; i < Template.GlobalParameters.Parameters.Count; i++)
-                    if (GlParameters.Parameters.Values.ElementAt(i) != Template.GlobalParameters.Parameters.Values.ElementAt(i))
+                for (int i = 0; i < DocTemplate.GlobalParameters.Parameters.Count; i++)
+                    if (GlParameters.Parameters.Values.ElementAt(i) != DocTemplate.GlobalParameters.Parameters.Values.ElementAt(i))
                         GlobalErrors.Add(new Error(GlParameters.Parameters.Keys.ElementAt(i)));
 
                 if (GlobalErrors.Count > 0)
