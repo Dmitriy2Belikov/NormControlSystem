@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Packaging;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace Project
 {
-    class Paragraph : IDocument
+    class Fragment : IDocument
     {
         public DocumentFormat.OpenXml.OpenXmlElement XmlData { get; }
-        public List<Error> ErrorList;
-        private List<Fragment> fragments;
-        private ITemplate template;
+        private LocalParameters LcParameters;
+        private List<Error> ErrorsList;
         public Dictionary<string, List<string>> Attributes { get; set; }
+        private ITemplate template;
 
-        public Paragraph(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp)
+        public Fragment(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp)
         {
             XmlData = data;
             template = temp;
@@ -26,26 +23,16 @@ namespace Project
 
         public List<Error> GetErrors()
         {
-            ErrorList = new List<Error>();
-            fragments = new List<Fragment>();
+            ErrorsList = new List<Error>();
 
-            foreach (var child in XmlData.ChildElements)
-                fragments.Add(new Fragment(child, template));
+            
 
-            foreach (var fragment in fragments)
-                try
-                {
-                    foreach (var el in fragment.GetErrors())
-                        ErrorList.Union(fragment.GetErrors());
-                }
-                catch { continue; }
-
-            return ErrorList;
+            return ErrorsList;
         }
 
         public void SetAttributes()
         {
-            Attributes = new Dictionary<string, List<string>>(); // Все аттрибуты абзаца
+            Attributes = new Dictionary<string, List<string>>();
 
             for (int i = 0; i < XmlData.ChildElements.Count; i++)
             {

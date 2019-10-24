@@ -8,24 +8,24 @@ namespace Project
 {
     class GlobalParameters : IGlobalParameters
     {
-        public double MarginTop { get; }
-        public double MarginBottom { get; }
-        public double MarginLeft { get; }
-        public double MarginRight { get; }
-        public Dictionary<string, double> Parameters;
+        public string MarginTop { get; }
+        public string MarginBottom { get; }
+        public string MarginLeft { get; }
+        public string MarginRight { get; }
+        public Dictionary<string, string> Parameters;
 
-        public GlobalParameters(double margTop, double margRight, double margBottom, double margLeft)
+        public GlobalParameters(string margTop, string margRight, string margBottom, string margLeft)
         {
             MarginBottom = margBottom;
             MarginTop = margTop;
             MarginLeft = margLeft;
             MarginRight = margRight;
 
-            Parameters = new Dictionary<string, double>();
-            Parameters.Add("Margin Top", MarginTop);
-            Parameters.Add("Margin Right", MarginRight);
-            Parameters.Add("Margin Bottom", MarginBottom);
-            Parameters.Add("Margin Left", MarginLeft);
+            Parameters = new Dictionary<string, string>();
+            Parameters.Add("Верхнее поле", MarginTop);
+            Parameters.Add("Правое поле", MarginRight);
+            Parameters.Add("Нижнее поле", MarginBottom);
+            Parameters.Add("Левое поле", MarginLeft);
         }
     }
 }

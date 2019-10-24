@@ -14,42 +14,60 @@ namespace Project
         public const double Sm = 567;
         public const double Pt = 2;
     }
-    class Document
+
+    class Document : IDocument
     {
         private List<Paragraph> paragraphs;
         private string filePath;
-        private GlobalParameters GlParameters;
-        private ITemplate DocTemplate;
+        private GlobalParameters glParameters;
+        private ITemplate template;
+        public Dictionary<string, List<string>> Attributes { get; set; }
+        public List<Error> ErrorsList;
+        DocumentFormat.OpenXml.OpenXmlElement XmlData;
 
-        public Document(string path, ITemplate template)
+        public Document(string path, ITemplate temp)
         {
             paragraphs = new List<Paragraph>();
             filePath = path;
-            DocTemplate = template;
+            template = temp;
         }
 
-        public Dictionary<int, List<Error>> GetErrors()
+        public List<Error> GetErrors()
         {
-            var ErrorsDict = new Dictionary<int, List<Error>>();
-            var GlobalErrors = new List<Error>();
+            ErrorsList = new List<Error>();
 
             using (var document = WordprocessingDocument.Open(filePath, true))
             {
                 foreach (var paragraph in document.MainDocumentPart.Document.Body.ChildElements)
-                    paragraphs.Add(new Paragraph(paragraph));
+                    paragraphs.Add(new Paragraph(paragraph, template));
 
-                var globAttributes = paragraphs.Last().GetParagraphAttributes();
-                GlParameters = new GlobalParameters(globAttributes["pgMar"][0], globAttributes["pgMar"][1], globAttributes["pgMar"][2], globAttributes["pgMar"][3]);
+                glParameters = new GlobalParameters(paragraphs.Last().Attributes["pgMar"][0],
+                                                    paragraphs.Last().Attributes["pgMar"][1],
+                                                    paragraphs.Last().Attributes["pgMar"][2],
+                                                    paragraphs.Last().Attributes["pgMar"][3]);
 
-                for (int i = 0; i < DocTemplate.GlobalParameters.Parameters.Count; i++)
-                    if (GlParameters.Parameters.Values.ElementAt(i) != DocTemplate.GlobalParameters.Parameters.Values.ElementAt(i))
-                        GlobalErrors.Add(new Error(GlParameters.Parameters.Keys.ElementAt(i)));
-
-                if (GlobalErrors.Count > 0)
-                    ErrorsDict.Add(0, GlobalErrors); // 0 абзац - Глобальные параметры
+                for (int i = 0; i < template.GlobalParameters.Parameters.Count; i++)
+                    if (glParameters.Parameters.Values.ElementAt(i) != template.GlobalParameters.Parameters.Values.ElementAt(i))
+                        ErrorsList.Add(new Error(glParameters.Parameters.Keys.ElementAt(i), glParameters.Parameters[glParameters.Parameters.Keys.ElementAt(i)].ToString(), template.GlobalParameters.Parameters[glParameters.Parameters.Keys.ElementAt(i)].ToString()));
             }
 
-            return ErrorsDict;
+            return ErrorsList;
+        }
+
+        public void SetAttributes()
+        {
+            Attributes = new Dictionary<string, List<string>>(); // Все аттрибуты абзаца
+
+            for (int i = 0; i < XmlData.ChildElements.Count; i++)
+            {
+                var childAttr = new List<string>(); // Аттрибуты отдельного ребёнка
+
+                foreach (var attribute in XmlData.ChildElements[i].GetAttributes())
+                    childAttr.Add(attribute.Value);
+
+                if (!Attributes.ContainsKey(XmlData.ChildElements[i].LocalName))
+                    Attributes.Add(XmlData.ChildElements[i].LocalName, childAttr);
+            }
         }
     }
 }

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    interface ILocalParameters
+    interface IDocument
     {
-        string Font { get; }
-        string FontFamily { get; }
+        Dictionary<string, List<string>> Attributes { get; set; }
+        void SetAttributes();
+        List<Error> GetErrors();
     }
 }

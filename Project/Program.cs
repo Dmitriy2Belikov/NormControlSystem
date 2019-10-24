@@ -14,17 +14,11 @@ namespace Project
         static void Main(string[] args)
         {
             var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word.docx", new CourseWork());
-            var errorsDict = document.GetErrors();
+            var errors = document.GetErrors();
 
-            if (errorsDict.Keys.Count > 0)
-            {
-                foreach (var paragraphIndex in errorsDict)
-                    if (paragraphIndex.Value.Count > 0)
-                        foreach (var error in paragraphIndex.Value)
-                        {
-                            Console.WriteLine("Error in {0} paragraph in {1} parameter", paragraphIndex.Key, error.Parameter);
-                        }
-            }
+            if (errors.Count > 0)
+                foreach(var error in errors)
+                    Console.WriteLine("Ошибка: {0} (Ожидалось: {1}, Было: {2})", error.Parameter, error.ExpectValue, error.Value);
             else Console.WriteLine("Succesful!!!");
         }
     }

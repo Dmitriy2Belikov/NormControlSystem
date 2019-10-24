@@ -55,6 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Error.cs" />
+    <Compile Include="Fragment.cs" />
+    <Compile Include="Interfaces\IDocument.cs" />
     <Compile Include="Interfaces\ILocalParameters.cs" />
     <Compile Include="Interfaces\ITemplate.cs" />
     <Compile Include="LocalParameters.cs" />

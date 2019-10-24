@@ -12,10 +12,14 @@ namespace Project
     class Error
     {
         public string Parameter;
+        public string Value;
+        public string ExpectValue;
 
-        public Error(string param)
+        public Error(string param, string value, string expect)
         {
             Parameter = param;
+            Value = value;
+            ExpectValue = expect;
         }
     }
 }

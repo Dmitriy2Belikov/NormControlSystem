@@ -8,10 +8,10 @@ namespace Project
 {
     interface IGlobalParameters
     {
-        double MarginTop { get;}
-        double MarginBottom { get;}
-        double MarginLeft { get;}
-        double MarginRight { get;}
+        string MarginTop { get;}
+        string MarginBottom { get;}
+        string MarginLeft { get;}
+        string MarginRight { get;}
 
     }
 }

@@ -8,13 +8,18 @@ namespace Project
 {
     class LocalParameters : ILocalParameters
     {
-        public double Font { get; }
+        public string Font { get; }
         public string FontFamily { get; }
+        public Dictionary<string, string> Parameters;
 
-        public LocalParameters(double font, string fontFamily)
+        public LocalParameters(string font, string fontFamily)
         {
             Font = font;
             FontFamily = fontFamily;
+
+            Parameters = new Dictionary<string, string>();
+            Parameters.Add("Размер", font);
+            Parameters.Add("Шрифт", fontFamily);
         }
     }
 }
