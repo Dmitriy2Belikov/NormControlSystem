@@ -9,7 +9,6 @@ namespace Project
     interface IDocument
     {
         Dictionary<string, List<string>> Attributes { get; set; }
-        void SetAttributes();
         List<Error> GetErrors();
     }
 }

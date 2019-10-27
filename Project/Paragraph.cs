@@ -22,40 +22,54 @@ namespace Project
             XmlData = data;
             template = temp;
             SetAttributes();
+            GetFragments();
+            GetErrors();
         }
 
         public List<Error> GetErrors()
         {
             ErrorList = new List<Error>();
-            fragments = new List<Fragment>();
 
-            foreach (var child in XmlData.ChildElements)
-                fragments.Add(new Fragment(child, template));
-
-            foreach (var fragment in fragments)
-                try
-                {
-                    foreach (var el in fragment.GetErrors())
-                        ErrorList.Union(fragment.GetErrors());
-                }
-                catch { continue; }
+            foreach(var fragment in fragments)
+                foreach(var error in fragment.ErrorsList)
+                    if (!IsContains(error))
+                        ErrorList.Add(error);
 
             return ErrorList;
         }
 
-        public void SetAttributes()
+        private bool IsContains(Error error)
+        {
+            for(int i = 0; i < ErrorList.Count; i++)
+            {
+                if (ErrorList[i].Value == error.Value && ErrorList[i].Parameter == error.Parameter)
+                    return true;
+            }
+            return false;
+        }
+
+        private void GetFragments()
+        {
+            fragments = new List<Fragment>();
+
+            foreach (var child in XmlData.ChildElements)
+                foreach(var child2 in child.ChildElements)
+                    fragments.Add(new Fragment(child2, template));
+        }
+
+        private void SetAttributes()
         {
             Attributes = new Dictionary<string, List<string>>(); // Все аттрибуты абзаца
 
-            for (int i = 0; i < XmlData.ChildElements.Count; i++)
+            for (int i = 0; i < XmlData.Count(); i++)
             {
                 var childAttr = new List<string>(); // Аттрибуты отдельного ребёнка
 
-                foreach (var attribute in XmlData.ChildElements[i].GetAttributes())
+                foreach (var attribute in XmlData.GetAttributes())
                     childAttr.Add(attribute.Value);
 
-                if (!Attributes.ContainsKey(XmlData.ChildElements[i].LocalName))
-                    Attributes.Add(XmlData.ChildElements[i].LocalName, childAttr);
+                if (!Attributes.ContainsKey(XmlData.LocalName))
+                    Attributes.Add(XmlData.LocalName + i, childAttr);
             }
         }
     }

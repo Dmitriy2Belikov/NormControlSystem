@@ -15,14 +15,14 @@ namespace Project
         public const double Pt = 2;
     }
 
-    class Document : IDocument
+    class Document
     {
         private List<Paragraph> paragraphs;
         private string filePath;
         private GlobalParameters glParameters;
         private ITemplate template;
         public Dictionary<string, List<string>> Attributes { get; set; }
-        public List<Error> ErrorsList;
+        public Dictionary<int, List<Error>> ErrorsDict;
         DocumentFormat.OpenXml.OpenXmlElement XmlData;
 
         public Document(string path, ITemplate temp)
@@ -32,42 +32,47 @@ namespace Project
             template = temp;
         }
 
-        public List<Error> GetErrors()
+        public Dictionary<int, List<Error>> GetErrors()
         {
-            ErrorsList = new List<Error>();
+            ErrorsDict = new Dictionary<int, List<Error>>();
 
             using (var document = WordprocessingDocument.Open(filePath, true))
             {
-                foreach (var paragraph in document.MainDocumentPart.Document.Body.ChildElements)
-                    paragraphs.Add(new Paragraph(paragraph, template));
+                XmlData = document.MainDocumentPart.Document.Body;
+                GetParagraphs();
+                SetAttributes();
 
-                glParameters = new GlobalParameters(paragraphs.Last().Attributes["pgMar"][0],
-                                                    paragraphs.Last().Attributes["pgMar"][1],
-                                                    paragraphs.Last().Attributes["pgMar"][2],
-                                                    paragraphs.Last().Attributes["pgMar"][3]);
+                glParameters = new GlobalParameters(Attributes["pgMar"][0],
+                                                    Attributes["pgMar"][1],
+                                                    Attributes["pgMar"][2],
+                                                    Attributes["pgMar"][3]);
 
-                for (int i = 0; i < template.GlobalParameters.Parameters.Count; i++)
-                    if (glParameters.Parameters.Values.ElementAt(i) != template.GlobalParameters.Parameters.Values.ElementAt(i))
-                        ErrorsList.Add(new Error(glParameters.Parameters.Keys.ElementAt(i), glParameters.Parameters[glParameters.Parameters.Keys.ElementAt(i)].ToString(), template.GlobalParameters.Parameters[glParameters.Parameters.Keys.ElementAt(i)].ToString()));
+                for (int i = 0; i < paragraphs.Count; i++)
+                    if (paragraphs[i].ErrorList.Count > 0)
+                        ErrorsDict.Add(i, paragraphs[i].ErrorList);
+
+                return ErrorsDict;
             }
-
-            return ErrorsList;
         }
 
-        public void SetAttributes()
+        private void SetAttributes()
         {
-            Attributes = new Dictionary<string, List<string>>(); // Все аттрибуты абзаца
+            Attributes = new Dictionary<string, List<string>>();
 
-            for (int i = 0; i < XmlData.ChildElements.Count; i++)
+            foreach (var param in paragraphs.Last().XmlData.ChildElements)
             {
-                var childAttr = new List<string>(); // Аттрибуты отдельного ребёнка
+                var attrs = new List<string>();
+                foreach (var attr in param.GetAttributes())
+                    attrs.Add(attr.Value);
 
-                foreach (var attribute in XmlData.ChildElements[i].GetAttributes())
-                    childAttr.Add(attribute.Value);
-
-                if (!Attributes.ContainsKey(XmlData.ChildElements[i].LocalName))
-                    Attributes.Add(XmlData.ChildElements[i].LocalName, childAttr);
+                Attributes.Add(param.LocalName, attrs);
             }
+        }
+
+        private void GetParagraphs()
+        {
+            foreach (var paragraph in XmlData.ChildElements)
+                paragraphs.Add(new Paragraph(paragraph, template));
         }
     }
 }

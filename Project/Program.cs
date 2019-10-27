@@ -16,9 +16,10 @@ namespace Project
             var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word.docx", new CourseWork());
             var errors = document.GetErrors();
 
-            if (errors.Count > 0)
-                foreach(var error in errors)
-                    Console.WriteLine("Ошибка: {0} (Ожидалось: {1}, Было: {2})", error.Parameter, error.ExpectValue, error.Value);
+            if (errors.Keys.Count > 0)
+                foreach (var index in errors.Keys)
+                    foreach(var error in errors[index])
+                        Console.WriteLine("Ошибка: {0} (Ожидалось: {1}, было: {2})", error.Parameter, error.ExpectValue, error.Value);
             else Console.WriteLine("Succesful!!!");
         }
     }
