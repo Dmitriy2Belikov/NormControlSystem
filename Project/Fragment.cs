@@ -9,16 +9,25 @@ namespace Project
     class Fragment : IDocument
     {
         public DocumentFormat.OpenXml.OpenXmlElement XmlData { get; }
-        private LocalParameters lcParameters;
         public List<Error> ErrorsList { get; private set; }
         public Dictionary<string, List<string>> Attributes { get; set; }
         private ITemplate template;
+        private LocalParameters lcParams;
+        private Dictionary<string, List<string>> docDefaults;
 
-        public Fragment(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp)
+        public Fragment(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp, Dictionary<string, List<string>> docDef)
         {
             XmlData = data;
             template = temp;
+            docDefaults = docDef;
             SetAttributes();
+            GetErrors();
+        }
+
+        public Fragment(ITemplate temp, Dictionary<string, List<string>> docDef)
+        {
+            template = temp;
+            docDefaults = docDef;
             GetErrors();
         }
 
@@ -26,13 +35,17 @@ namespace Project
         {
             ErrorsList = new List<Error>();
 
-            if (Attributes.ContainsKey("sz") && Attributes.ContainsKey("rFonts"))
-            {
-                lcParameters = new LocalParameters(Attributes["sz"][0], Attributes["rFonts"][0]);
+            if (Attributes == null) Attributes = new Dictionary<string, List<string>>();
+            if (!Attributes.ContainsKey("sz"))
+                Attributes.Add(docDefaults.Keys.Where(x => x == "sz").ElementAt(0), docDefaults["sz"]);
+            if (!Attributes.ContainsKey("rFonts"))
+                Attributes.Add(docDefaults.Keys.Where(x => x == "rFonts").ElementAt(0), docDefaults["rFonts"]);
 
-                for (int i = 0; i < lcParameters.Parameters.Keys.Count; i++)
-                    if (lcParameters.Parameters.Values.ElementAt(i) != template.LocalParameters.Parameters.Values.ElementAt(i)) ErrorsList.Add(new Error(lcParameters.Parameters.Keys.ElementAt(i), lcParameters.Parameters.Values.ElementAt(i), template.LocalParameters.Parameters.Values.ElementAt(i)));
-            }
+            lcParams = new LocalParameters(Attributes["sz"][0], Attributes["rFonts"][0]);
+
+            foreach (var param in lcParams.Parameters)
+                if (lcParams.Parameters[param.Key] != template.LocalParameters.Parameters[param.Key])
+                    ErrorsList.Add(new Error(param.Key, param.Value, template.LocalParameters.Parameters[param.Key]));
 
             return ErrorsList;
         }

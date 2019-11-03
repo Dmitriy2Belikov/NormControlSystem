@@ -16,11 +16,13 @@ namespace Project
         private List<Fragment> fragments;
         private ITemplate template;
         public Dictionary<string, List<string>> Attributes { get; set; }
+        private Dictionary<string, List<string>> docDefaults;
 
-        public Paragraph(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp)
+        public Paragraph(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp, Dictionary<string, List<string>> docDef)
         {
             XmlData = data;
             template = temp;
+            docDefaults = docDef;
             SetAttributes();
             GetFragments();
             GetErrors();
@@ -53,8 +55,20 @@ namespace Project
             fragments = new List<Fragment>();
 
             foreach (var child in XmlData.ChildElements)
-                foreach(var child2 in child.ChildElements)
-                    fragments.Add(new Fragment(child2, template));
+            {
+                var frNames = new List<string>();
+                Dictionary<string, DocumentFormat.OpenXml.OpenXmlElement> frXml = new Dictionary<string, DocumentFormat.OpenXml.OpenXmlElement>();
+
+                foreach (var child2 in child.ChildElements)
+                {
+                    if (child2.LocalName == "rPr")
+                    {
+                        fragments.Add(new Fragment(child2, template, docDefaults));
+                        break;
+                    }
+                    else fragments.Add(new Fragment(template, docDefaults));
+                }
+            }
         }
 
         private void SetAttributes()

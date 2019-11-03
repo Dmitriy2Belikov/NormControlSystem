@@ -13,13 +13,13 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word.docx", new CourseWork());
+            var document = new Document(@"C:\Users\Дмитрий\Desktop\СХС_Отчёт(04.05.19) — копия.docx", new CourseWork());
             var errors = document.GetErrors();
 
             if (errors.Keys.Count > 0)
                 foreach (var index in errors.Keys)
                     foreach(var error in errors[index])
-                        Console.WriteLine("Ошибка: {0} (Ожидалось: {1}, было: {2})", error.Parameter, error.ExpectValue, error.Value);
+                        Console.WriteLine("Ошибка: {0} (Ожидалось: {1}, было: {2}) в {3} абзаце", error.Parameter, error.ExpectValue, error.Value, index + 1);
             else Console.WriteLine("Succesful!!!");
         }
     }

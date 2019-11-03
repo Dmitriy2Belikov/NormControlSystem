@@ -23,6 +23,7 @@ namespace Project
         private ITemplate template;
         public Dictionary<string, List<string>> Attributes { get; set; }
         public Dictionary<int, List<Error>> ErrorsDict;
+        private Dictionary<string, List<string>> docDefaults;
         DocumentFormat.OpenXml.OpenXmlElement XmlData;
 
         public Document(string path, ITemplate temp)
@@ -38,7 +39,10 @@ namespace Project
 
             using (var document = WordprocessingDocument.Open(filePath, true))
             {
+                var styles = document.MainDocumentPart.StyleDefinitionsPart.Styles.DocDefaults;
                 XmlData = document.MainDocumentPart.Document.Body;
+
+                GetDefaults(styles);
                 GetParagraphs();
                 SetAttributes();
 
@@ -53,6 +57,23 @@ namespace Project
 
                 return ErrorsDict;
             }
+        }
+
+        private void GetDefaults(DocumentFormat.OpenXml.Wordprocessing.DocDefaults DocDef)
+        {
+            docDefaults = new Dictionary<string, List<string>>();
+
+            foreach (var part in DocDef)
+                foreach (var param in part.ChildElements)
+                {
+                    foreach (var attr in param.ChildElements)
+                    {
+                        var attrs = new List<string>();
+                        foreach (var value in attr.GetAttributes())
+                            attrs.Add(value.Value);
+                        docDefaults.Add(attr.LocalName, attrs);
+                    }
+                }
         }
 
         private void SetAttributes()
@@ -72,7 +93,7 @@ namespace Project
         private void GetParagraphs()
         {
             foreach (var paragraph in XmlData.ChildElements)
-                paragraphs.Add(new Paragraph(paragraph, template));
+                paragraphs.Add(new Paragraph(paragraph, template, docDefaults));
         }
     }
 }
