@@ -17,7 +17,7 @@ namespace Project
 
     class Document
     {
-        private List<Paragraph> paragraphs;
+        private Dictionary<int, List<Paragraph>> Chapters;
         private string filePath;
         private GlobalParameters glParameters;
         private ITemplate template;
@@ -28,7 +28,6 @@ namespace Project
 
         public Document(string path, ITemplate temp)
         {
-            paragraphs = new List<Paragraph>();
             filePath = path;
             template = temp;
         }
@@ -43,7 +42,7 @@ namespace Project
                 XmlData = document.MainDocumentPart.Document.Body;
 
                 GetDefaults(styles);
-                GetParagraphs();
+                GetChapters();
                 SetAttributes();
 
                 glParameters = new GlobalParameters(Attributes["pgMar"][0],
@@ -51,9 +50,15 @@ namespace Project
                                                     Attributes["pgMar"][2],
                                                     Attributes["pgMar"][3]);
 
-                for (int i = 0; i < paragraphs.Count; i++)
-                    if (paragraphs[i].ErrorList.Count > 0)
-                        ErrorsDict.Add(i, paragraphs[i].ErrorList);
+                foreach (var chapter in Chapters)
+                {
+                    var erList = new List<Error>();
+                    foreach (var paragraph in chapter.Value)
+                        erList.AddRange(paragraph.ErrorList);
+
+                    if(erList.Count > 0)
+                        ErrorsDict.Add(chapter.Key, erList);
+                }
 
                 return ErrorsDict;
             }
@@ -80,7 +85,7 @@ namespace Project
         {
             Attributes = new Dictionary<string, List<string>>();
 
-            foreach (var param in paragraphs.Last().XmlData.ChildElements)
+            foreach (var param in Chapters.Last().Value.Last().XmlData.ChildElements)
             {
                 var attrs = new List<string>();
                 foreach (var attr in param.GetAttributes())
@@ -90,10 +95,39 @@ namespace Project
             }
         }
 
-        private void GetParagraphs()
+        private void GetChapters()
         {
-            foreach (var paragraph in XmlData.ChildElements)
-                paragraphs.Add(new Paragraph(paragraph, template, docDefaults));
+            Chapters = new Dictionary<int, List<Paragraph>>();
+            var paragraphs = new List<List<Paragraph>>();
+            paragraphs.Add(new List<Paragraph>());
+            var i = 0;
+            var test = true;
+            
+            foreach(var paragraph in XmlData)
+            {
+                foreach (var child in paragraph)
+                    if (child.LocalName == "pPr")
+                        foreach (var el in child)
+                            if (el.LocalName == "pStyle" && el.GetAttributes().First().Value == "1")
+                                if (paragraphs.Last().Count > 0)
+                                {
+                                    Chapters.Add(i, paragraphs.Last());
+                                    i++;
+                                    paragraphs.Add(new List<Paragraph>());
+                                    paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
+                                    test = false;
+                                }
+                                else if (paragraphs.Last().Count == 0 && test)
+                                {
+                                    paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
+                                    test = false;
+                                }
+                if (test) paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
+                else test = true;
+            }
+
+            if (paragraphs.Last().Count > 0)
+                Chapters.Add(i, paragraphs.Last());
         }
     }
 }

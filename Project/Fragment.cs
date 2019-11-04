@@ -37,9 +37,9 @@ namespace Project
 
             if (Attributes == null) Attributes = new Dictionary<string, List<string>>();
             if (!Attributes.ContainsKey("sz"))
-                Attributes.Add(docDefaults.Keys.Where(x => x == "sz").ElementAt(0), docDefaults["sz"]);
+                Attributes.Add(docDefaults.Keys.Where(x => x == "sz").First(), docDefaults["sz"]);
             if (!Attributes.ContainsKey("rFonts"))
-                Attributes.Add(docDefaults.Keys.Where(x => x == "rFonts").ElementAt(0), docDefaults["rFonts"]);
+                Attributes.Add(docDefaults.Keys.Where(x => x == "rFonts").First(), docDefaults["rFonts"]);
 
             lcParams = new LocalParameters(Attributes["sz"][0], Attributes["rFonts"][0]);
 

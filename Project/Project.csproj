@@ -54,6 +54,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="Fragment.cs" />
     <Compile Include="Interfaces\IDocument.cs" />

@@ -53,6 +53,7 @@ namespace Project
         private void GetFragments()
         {
             fragments = new List<Fragment>();
+            var test = true;
 
             foreach (var child in XmlData.ChildElements)
             {
@@ -64,9 +65,10 @@ namespace Project
                     if (child2.LocalName == "rPr")
                     {
                         fragments.Add(new Fragment(child2, template, docDefaults));
+                        test = false;
                         break;
                     }
-                    else fragments.Add(new Fragment(template, docDefaults));
+                    else if (child2.LocalName == "t" && test) fragments.Add(new Fragment(template, docDefaults));
                 }
             }
         }
