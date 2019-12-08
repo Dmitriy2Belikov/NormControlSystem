@@ -9,6 +9,6 @@ namespace Project
     interface ITemplate
     {
         GlobalParameters GlobalParameters { get; }
-        LocalParameters LocalParameters { get; }
+        ParagraphParameters ParagraphParameters { get; }
     }
 }

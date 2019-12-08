@@ -3,50 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Packaging;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace Project
 {
-    class Paragraph : ITextElement
+    class Header : ITextElement
     {
         public DocumentFormat.OpenXml.OpenXmlElement XmlData { get; }
         public List<Error> ErrorList { get; private set; }
         private List<Fragment> fragments;
+        public List<Paragraph> Paragraphs;
+        public List<SubHeader> SubHeaders;
         private ITemplate template;
         public Dictionary<string, List<string>> Attributes { get; set; }
         private Dictionary<string, List<string>> docDefaults;
         private int parNum; // Delete this
 
-        public Paragraph(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp, Dictionary<string, List<string>> docDef, int num)
+        public Header(DocumentFormat.OpenXml.OpenXmlElement data, ITemplate temp, Dictionary<string, List<string>> docDef, int num)
         {
             parNum = num;
             XmlData = data;
+            Paragraphs = new List<Paragraph>();
+            SubHeaders = new List<SubHeader>();
             template = temp;
             docDefaults = docDef;
             SetFragments();
             SetErrors();
         }
 
-        private void SetErrors()
+        public Header(ITemplate temp, Dictionary<string, List<string>> docDef, int num)
         {
-            ErrorList = new List<Error>();
-
-            foreach(var fragment in fragments)
-                foreach(var error in fragment.ErrorList)
-                    if (!IsContains(error))
-                        ErrorList.Add(error);
-        }
-
-        private bool IsContains(Error error)
-        {
-            for(int i = 0; i < ErrorList.Count; i++)
-            {
-                if (ErrorList[i].Value == error.Value && ErrorList[i].Parameter == error.Parameter)
-                    return true;
-            }
-            return false;
+            parNum = num;
+            Paragraphs = new List<Paragraph>();
+            SubHeaders = new List<SubHeader>();
+            template = temp;
+            docDefaults = docDef;
         }
 
         private void SetFragments()
@@ -70,6 +60,26 @@ namespace Project
                     else if (child2.LocalName == "t" && IsDef) fragments.Add(new Fragment(template, docDefaults, parNum));
                 }
             }
+        }
+
+        private void SetErrors()
+        {
+            ErrorList = new List<Error>();
+
+            foreach (var fragment in fragments)
+                foreach (var error in fragment.ErrorList)
+                    if (!IsContains(error))
+                        ErrorList.Add(error);
+        }
+
+        private bool IsContains(Error error)
+        {
+            for (int i = 0; i < ErrorList.Count; i++)
+            {
+                if (ErrorList[i].Value == error.Value && ErrorList[i].Parameter == error.Parameter)
+                    return true;
+            }
+            return false;
         }
     }
 }

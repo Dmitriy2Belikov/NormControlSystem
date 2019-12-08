@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    class LocalParameters : ILocalParameters
+    class ParagraphParameters : IParagraphParameters
     {
         public string Font { get; }
         public string FontFamily { get; }
         public Dictionary<string, string> Parameters;
 
-        public LocalParameters(string font, string fontFamily)
+        public ParagraphParameters(string font, string fontFamily)
         {
             Font = font;
             FontFamily = fontFamily;
