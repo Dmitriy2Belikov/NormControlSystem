@@ -17,7 +17,7 @@ namespace Project
 
     class Document
     {
-        private Dictionary<int, List<Paragraph>> Chapters;
+        private Dictionary<int, Header> Chapters;
         private string filePath;
         private GlobalParameters glParameters;
         private ITemplate template;
@@ -41,8 +41,8 @@ namespace Project
                 var styles = document.MainDocumentPart.StyleDefinitionsPart.Styles.DocDefaults;
                 XmlData = document.MainDocumentPart.Document.Body;
 
-                GetDefaults(styles);
-                GetChapters();
+                SetDefaults(styles);
+                SetChapters();
                 SetAttributes();
 
                 glParameters = new GlobalParameters(Attributes["pgMar"][0],
@@ -53,7 +53,7 @@ namespace Project
                 foreach (var chapter in Chapters)
                 {
                     var erList = new List<Error>();
-                    foreach (var paragraph in chapter.Value)
+                    foreach (var paragraph in chapter.Value.Paragraphs)
                         erList.AddRange(paragraph.ErrorList);
 
                     if(erList.Count > 0)
@@ -64,7 +64,7 @@ namespace Project
             }
         }
 
-        private void GetDefaults(DocumentFormat.OpenXml.Wordprocessing.DocDefaults DocDef)
+        private void SetDefaults(DocumentFormat.OpenXml.Wordprocessing.DocDefaults DocDef)
         {
             docDefaults = new Dictionary<string, List<string>>();
 
@@ -85,7 +85,7 @@ namespace Project
         {
             Attributes = new Dictionary<string, List<string>>();
 
-            foreach (var param in Chapters.Last().Value.Last().XmlData.ChildElements)
+            foreach (var param in GetParagraph(XmlData.Count() - 1).XmlData.ChildElements)
             {
                 var attrs = new List<string>();
                 foreach (var attr in param.GetAttributes())
@@ -95,39 +95,61 @@ namespace Project
             }
         }
 
-        private void GetChapters()
+        private Paragraph GetParagraph(int num)
         {
-            Chapters = new Dictionary<int, List<Paragraph>>();
-            var paragraphs = new List<List<Paragraph>>();
-            paragraphs.Add(new List<Paragraph>());
+            return new Paragraph(XmlData.ElementAt(num), template, docDefaults, -1);
+        }
+
+        private void SetChapters()
+        {
+            Chapters = new Dictionary<int, Header>();
+            bool isSubHeader = false;
+            bool isParagraph = false;
             var i = 0;
-            var test = true;
+            int parNum = 0; // Delete this
             
             foreach(var paragraph in XmlData)
             {
                 foreach (var child in paragraph)
                     if (child.LocalName == "pPr")
                         foreach (var el in child)
+                        {
                             if (el.LocalName == "pStyle" && el.GetAttributes().First().Value == "1")
-                                if (paragraphs.Last().Count > 0)
+                            {
+                                var header = new Header(paragraph, template, docDefaults, parNum);
+                                Chapters.Add(i, header);
+                                isSubHeader = false;
+                                isParagraph = false;
+                                i++;
+                            }
+                            if (el.LocalName == "pStyle" && el.GetAttributes().First().Value == "2")
+                            {
+                                var subHeader = new SubHeader(paragraph, template, docDefaults, parNum);
+                                if (Chapters.Count > 0)
+                                    Chapters.Last().Value.SubHeaders.Add(subHeader);
+                                else
                                 {
-                                    Chapters.Add(i, paragraphs.Last());
-                                    i++;
-                                    paragraphs.Add(new List<Paragraph>());
-                                    paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
-                                    test = false;
+                                    var header = new Header(template, docDefaults, parNum);
+                                    Chapters.Add(i, header);
+                                    Chapters.Last().Value.SubHeaders.Add(subHeader);
                                 }
-                                else if (paragraphs.Last().Count == 0 && test)
-                                {
-                                    paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
-                                    test = false;
-                                }
-                if (test) paragraphs.Last().Add(new Paragraph(paragraph, template, docDefaults));
-                else test = true;
+                                isSubHeader = true;
+                                isParagraph = false;
+                            }
+                        }
+                if (Chapters.Count > 0 && !isSubHeader && isParagraph && paragraph != XmlData.Last())
+                    Chapters.Last().Value.Paragraphs.Add(new Paragraph(paragraph, template, docDefaults, parNum));
+                else if (Chapters.Count > 0 && isSubHeader && isParagraph && paragraph != XmlData.Last())
+                    Chapters.Last().Value.SubHeaders.Last().Paragraphs.Add(new Paragraph(paragraph, template, docDefaults, parNum));
+                else if (Chapters.Count < 1)
+                {
+                    var header = new Header(template, docDefaults, parNum);
+                    Chapters.Add(i, header);
+                    i++;
+                }
+                isParagraph = true;
+                parNum++;
             }
-
-            if (paragraphs.Last().Count > 0)
-                Chapters.Add(i, paragraphs.Last());
         }
     }
 }

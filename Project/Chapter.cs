@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    interface ILocalParameters
+    class Chapter
     {
-        string Font { get; }
-        string FontFamily { get; }
+        private List<Header> headers;
+
+        public Chapter()
+        {
+
+        }
     }
 }

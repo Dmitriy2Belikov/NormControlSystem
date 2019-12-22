@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Project
 {
-    interface IDocument
+    interface IParagraphParameters
     {
-        Dictionary<string, List<string>> Attributes { get; set; }
-        List<Error> GetErrors();
+        string Font { get; }
+        string FontFamily { get; }
     }
 }
