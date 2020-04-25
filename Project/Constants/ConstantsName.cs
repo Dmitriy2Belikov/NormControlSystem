@@ -4,15 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project
+namespace Project.Constants
 {
-    class Chapter
+    static class ConstantsName
     {
-        private List<Header> headers;
-
-        public Chapter()
-        {
-
-        }
+        public static string PageMargin = "pgMar";
     }
 }

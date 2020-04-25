@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project
+namespace Project.Text_Hierarchy
 {
-    interface IParagraphParameters
+    class Fragment
     {
-        string Font { get; }
-        string FontFamily { get; }
+
     }
 }
