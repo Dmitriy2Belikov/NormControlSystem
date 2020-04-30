@@ -21,6 +21,7 @@ namespace Project
         private List<Error> _errors;
         private string _filePath;
         private OpenXmlElement _xmlData;
+        private OpenXmlElement _stylesXmlData;
 
         public Document(string path, ITemplate template)
         {
@@ -35,10 +36,11 @@ namespace Project
             using (var document = WordprocessingDocument.Open(_filePath, true))
             {
                 _xmlData = document.MainDocumentPart.Document.Body;
+                _stylesXmlData = document.MainDocumentPart.StyleDefinitionsPart.Styles;
 
                 var paragraphs = GetParagraphs();
 
-                var globalParamsXML = paragraphs.Last().GetXML();
+                var globalParamsXML = _xmlData.ChildElements.FirstOrDefault(g => g.LocalName == NameInXML.GlobalParameters);
 
                 _errors.AddRange(GetGlobalErrors(globalParamsXML));
                 _errors.AddRange(GetParagraphErrors(paragraphs));
@@ -50,9 +52,10 @@ namespace Project
         private List<Paragraph> GetParagraphs()
         {
             var paragraphs = new List<Paragraph>();
+            var paragraphsInXML = _xmlData.ChildElements.Where(p => p.LocalName == NameInXML.Paragraph);
 
-            foreach (var paragraph in _xmlData)
-                paragraphs.Add(new Paragraph(paragraph));
+            foreach (var paragraph in paragraphsInXML)
+                paragraphs.Add(new Paragraph(paragraph, _stylesXmlData, _template));
 
             return paragraphs;
         }
@@ -61,22 +64,22 @@ namespace Project
         {
             var globalErrors = new List<Error>();
 
-            GlobalParameters globalParameters = GetGlobalParameters(XML);
+            var globalParameters = GetGlobalParameters(XML);
             var templateParameters = _template.GlobalParameters;
 
             for (int i = 0; i < templateParameters.Parameters.Count; i++)
-                if (globalParameters.GetParameterValue(i) != templateParameters.GetParameterValue(i))
-                {
-                    globalErrors.Add
-                    (
-                        new Error
-                        (
-                            templateParameters.GetParameterName(i),
-                            templateParameters.GetParameterValue(i),
-                            globalParameters.GetParameterValue(i)
-                        )
-                    );
-                }
+                for (int j = 0; j < globalParameters.Parameters.Count; j++)
+                    if (globalParameters.GetParameterName(j) == templateParameters.GetParameterName(i))
+                        if (globalParameters.GetParameterValue(j) != templateParameters.GetParameterValue(i))
+                            globalErrors.Add
+                            (
+                                new Error
+                                (
+                                    templateParameters.GetParameterName(i),
+                                    templateParameters.GetParameterValue(i),
+                                    globalParameters.GetParameterValue(j)
+                                )
+                            );
 
             return globalErrors;
         }
@@ -87,7 +90,7 @@ namespace Project
 
             foreach (var parameter in XML)
             {
-                if (parameter.LocalName == ConstantsName.PageMargin)
+                if (parameter.LocalName == NameInXML.PageMargin)
                 {
                     var attributes = parameter.GetAttributes();
 

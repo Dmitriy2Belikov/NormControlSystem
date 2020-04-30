@@ -11,7 +11,8 @@ namespace Project
         public enum ValueTypes
         {
             Pt,
-            Sm
+            Sm,
+            FontFamily
         }
 
         private static int Pt = 2;

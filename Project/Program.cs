@@ -14,8 +14,11 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            var document = new Document(@"C:\Users\Дмитрий\Desktop\Документ Microsoft Word (2).docx", new CourseWork());
+            var document = new Document(@"C:\Users\Дмитрий\Desktop\NormControlAlghorithm\Project\TestDocuments\СХС_Отчёт(04.05.19) — копия.docx", new CourseWork());
             var errors = document.GetErrors();
+
+            foreach (var error in errors)
+                Console.WriteLine("{0}: Ожидалось - {1}, Было - {2}", error.ParameterName, error.Expected, error.Actual);
         }
     }
 }

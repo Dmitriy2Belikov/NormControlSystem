@@ -5,6 +5,6 @@ namespace Project.Templates.Interfaces
     public interface ITemplate
     {
         GlobalParameters GlobalParameters { get; }
-        ParagraphParameters ParagraphParameters { get; }
+        TextParameters TextParameters { get; }
     }
 }

@@ -12,5 +12,7 @@ namespace Project.Constants
         public static string MarginBottom = "Нижнее поле";
         public static string MarginLeft = "Левое поле";
         public static string MarginRight = "Правое поле";
+        public static string FontFamily = "Шрифт";
+        public static string FontSize = "Размер шрифта";
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project.Templates.Parameters
 {
-    public class GlobalParameters : IGlobalParameters
+    public class GlobalParameters : ITextParameters
     {
         public List<Parameter> Parameters { get; }
         private bool _isEditable;

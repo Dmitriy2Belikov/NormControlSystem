@@ -19,11 +19,12 @@ namespace Project.Templates
             GlobalParameters.AddParameter(NameForUsers.MarginLeft, "3", ValueManager.ValueTypes.Sm);
             GlobalParameters.AddParameter(NameForUsers.MarginRight, "1,5", ValueManager.ValueTypes.Sm);
 
-            ParagraphParameters = new ParagraphParameters("14", "Times New Roman");
+            TextParameters = new TextParameters(false);
+            TextParameters.AddParameter(NameForUsers.FontFamily, "Times New Roman", ValueManager.ValueTypes.FontFamily);
+            TextParameters.AddParameter(NameForUsers.FontSize, "14", ValueManager.ValueTypes.Pt);
         }
 
         public GlobalParameters GlobalParameters { get; }
-
-        public ParagraphParameters ParagraphParameters { get; }
+        public TextParameters TextParameters { get; }
     }
 }
